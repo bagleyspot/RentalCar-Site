@@ -29,9 +29,28 @@ router.delete('/deleteuser/:username', async (req,res) => {
 })
 
 
+/**
+ * Metodo che va a realizzare la prenotazione del veicolo
+ */
+router.post('/bookingcar', async (req, res) => {
+    return res.json(await userService.userService.bookingCar(req.body).then(result => {return result}));
+})
 
-router.get('/bookingcar', async (req, res) => {
-    return res.json(await userService.userService.bookingCar().then(result => {return result}));
+
+/**
+ * Metodo che va a rimuovere la prenotazione a partire dal codice prenotazione
+ */
+router.delete('/deletebooking/:codicePrenotazione', async (req,res) => {
+    return res.json(await userService.userService.deleteBooking(req.params.codicePrenotazione))
+})
+
+
+
+/**
+ * Metodo che mi ritorna tutte le prenotazioni
+ */
+router.get('/getallbooking', async (req,res) => {
+    return res.json(await  userService.userService.getAllBooking())
 })
 
 
