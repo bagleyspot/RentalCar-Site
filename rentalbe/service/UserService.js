@@ -12,6 +12,7 @@ const BookingResponse = require('../response/BookingResponse')
 const utility = require('../utility/Utility')
 
 
+
 /**
  * Metodo che mi ritorna tutti gli utenti registrati
  * @returns {Promise<[UserResponse]>}
@@ -31,11 +32,19 @@ async function getAllUsers(){
 }
 
 
+
 /**
  * Metodo che mi inserice un nuovo utente
  * @returns {Promise<EsitoResponse>}
  */
 async function insertUser(user){
+
+    let userExist = null;
+    //Vado a vedere se lo username inserito già esiste all'interno del DB
+    userExist = User.findOne({username:user.username}).then(result => {return result});
+
+    //Se esiste e quindi ritorna l'utente ottenuto dallo username, allora l'inserimento è fallito
+    if (userExist !== null) return new EsitoResponse(false, "Username già esistente")
 
     const elem = new User({
         username: user.username,
@@ -47,7 +56,19 @@ async function insertUser(user){
     })
 
     return await elem.save().then( result => {return new EsitoResponse(true, "Salvataggio avvenuto")})
-        .catch(err => {return new EsitoResponse(false, "Salvataggio fallito"); console.log(err)})
+        .catch(err => {console.log(err); return new EsitoResponse(false, "Salvataggio fallito")})
+}
+
+/**
+ * Metodo che mi va a realizzare l'update dell'utente
+ * @param user
+ * @returns {Promise<any>}
+ */
+async function updateUser(user){
+
+    return await User.updateOne({username:user.username}, {$set: {password:user.password, nome: user.nome, cognome: user.cognome, dataDiNascita: user.dataDiNascita, ruolo: user.ruolo}})
+        .then( result => {return new EsitoResponse(true, "Modifica effettuata")})
+        .catch( err => {console.log(err); return new EsitoResponse(false, "Modifica fallita")})
 }
 
 
@@ -64,6 +85,7 @@ async function deleteUser(username){
     if ( result.deletedCount === 0) return new EsitoResponse(false, "Eliminazione fallita")
     else return new EsitoResponse(true, "Eliminazione avvenuta con successo")
 }
+
 
 
 /**
@@ -112,6 +134,7 @@ async function bookingCar(booking) {
  * @returns {Promise<EsitoResponse>}
  */
 async function deleteBooking(codicePrenotazione){
+
     const esito = await Booking.deleteOne({codicePrenotazione: codicePrenotazione}).then(result => {return result})
                     .catch(err => {console.log(err)})
 
@@ -140,10 +163,29 @@ async function getAllBooking(){
 
 
 
+async function  validationBooking(idBooking){
+    let booking = {};
+    booking = await Booking.findOne({codicePrenotazione:idBooking}).then(result => {return result})
+        .catch(err => {console.log(err); return null})
+
+    if( booking === null || booking === {}) {
+        return new EsitoResponse(false, "Prenotazione non trovata")
+    }
+    else {
+        return await Booking.updateOne({codicePrenotazione:idBooking}, {$set: {validata:true}})
+            .then( result => {return new EsitoResponse(true, "Validazione effettuata")})
+            .catch( err => {console.log(err); return new EsitoResponse(false, "Validazione fallita")})
+    }
+}
+
+
+
 exports.userService = {getAllUsers,
                         insertUser,
                         deleteUser,
                         bookingCar,
                         deleteBooking,
                         getAllBooking,
-                        }
+                        updateUser,
+                        validationBooking,
+}

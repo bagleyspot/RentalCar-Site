@@ -22,6 +22,12 @@ const Booking = mongoose.Schema({
     usernameUtente: {
         type: String,
         required: true
+    },
+
+    validata: {
+        type: Boolean,
+        required: true,
+        default: false,
     }
 
 })

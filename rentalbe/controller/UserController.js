@@ -13,6 +13,25 @@ router.get('/allusers', async (req,res) => {
 
 
 /**
+ * Metodo per l'aggiornamento utente
+ */
+router.put('/updateuser', async (req,res) => {
+    return res.json(await userService.userService.updateUser(req.body))
+})
+
+
+
+/**
+ * Metodo che mi va a validare l'operazione di booking relativa ad un dato utente
+ * Tale operazione piò essere eseguita solo ed esclusivamente da utenti con grado superiore
+ */
+router.get('/validBooking/:idBooking', async ( req,res) => {
+    return res.json(await userService.userService.validationBooking(res.params.idBooking))
+})
+
+
+
+/**
  * Metodo che mi inserisce un nuovo utente
  */
 router.post('/insertuser', async (req, res) => {
@@ -29,12 +48,14 @@ router.delete('/deleteuser/:username', async (req,res) => {
 })
 
 
+
 /**
  * Metodo che va a realizzare la prenotazione del veicolo
  */
 router.post('/bookingcar', async (req, res) => {
     return res.json(await userService.userService.bookingCar(req.body).then(result => {return result}));
 })
+
 
 
 /**

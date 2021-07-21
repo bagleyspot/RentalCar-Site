@@ -16,5 +16,8 @@
     "mongoose": "5.13.0",
     "node-cron": "3.0.0",
     "nodemon": "1.19.0"
-  }
+  },
+  "swagger": "2.0",
+  "info": {},
+  "paths": {}
 }
